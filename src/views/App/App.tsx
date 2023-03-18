@@ -24,7 +24,8 @@ function App() {
         const keyList = ['Enter', 'NumpadEnter']
         if (keyList.includes((ev.code))) {
             if (value.trim() === '') return
-            setTodoList(list => list.concat({id: nanoid(4), name: value, done: false}))
+            else if(todoList.some(item => item.name === value.trim())) return alert('已经有相同的咯~！')
+            setTodoList(list => [{id: nanoid(4), name: value, done: false}].concat(list))
             setValue('')
         }
     }
@@ -37,6 +38,9 @@ function App() {
         setTodoList(list => list.map(item => {
             if (item.id === id) return {...item, done: !item.done}
             else return item
+        }).sort((a, b) => {
+            if (!a.done && b.done) return -1
+            else return 0
         }))
     }
 
@@ -48,8 +52,8 @@ function App() {
                        onKeyDown={handleAddItem}/>
             </div>
             <ul className={styless.list}>
-                {todoList.sort(item => item.done ? 1 : -1).map(todo => <li className={todo.done ? styless.doneItem : ''}
-                                                                           key={todo.id}>
+                {todoList.map(todo => <li className={todo.done ? styless.doneItem : ''}
+                                          key={todo.id}>
                     {todo.done ?
                         <CheckOne className={styless.done} onClick={() => handleDoneItem(todo.id)} theme="outline"
                                   size="24"/> :
@@ -61,9 +65,11 @@ function App() {
                 </li>)}
                 {todoList.length === 0 && <li className={styless.empty}>这里空空如也~</li>}
             </ul>
-            <div className={styless.footer}>{todoList.reduce((total, item) => {
-                return total + (item.done ? 1 : 0)
-            }, 0)} / {todoList.length}</div>
+            <div className={styless.footer}>
+                {todoList.reduce((total, item) => {
+                    return total + (item.done ? 1 : 0)
+                }, 0)} / {todoList.length}
+            </div>
         </div>
     );
 }
